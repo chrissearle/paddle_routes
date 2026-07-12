@@ -13,6 +13,8 @@ const props = defineProps<{
 const sortedTracks = computed(() =>
   [...props.tracks].sort((a, b) => b.date.localeCompare(a.date)),
 )
+
+const craftById = computed(() => new Map(props.craft.map((c) => [c.id, c])))
 </script>
 
 <template>
@@ -25,7 +27,33 @@ const sortedTracks = computed(() =>
       <div class="route-card">
         <div class="route-card__info">
           <p class="route-card__date font-mono">{{ track.date }}</p>
-          <p class="route-card__craft">{{ track.craftName }}</p>
+          <UPopover v-if="craftById.get(track.craftId)" mode="click">
+            <button type="button" class="route-card__craft route-card__craft--link">
+              {{ track.craftName }}
+            </button>
+            <template #content>
+              <div class="craft-popover font-mono">
+                <p class="craft-popover__name">{{ craftById.get(track.craftId)!.name }}</p>
+                <dl class="craft-popover__details">
+                  <dt>Type</dt>
+                  <dd>{{ craftById.get(track.craftId)!.type }}</dd>
+                  <dt>Make</dt>
+                  <dd>{{ craftById.get(track.craftId)!.make }}</dd>
+                  <template v-if="craftById.get(track.craftId)!.model">
+                    <dt>Model</dt>
+                    <dd>{{ craftById.get(track.craftId)!.model }}</dd>
+                  </template>
+                  <dt>Colour</dt>
+                  <dd>{{ craftById.get(track.craftId)!.colour }}</dd>
+                  <template v-if="craftById.get(track.craftId)!.registration">
+                    <dt>Reg.</dt>
+                    <dd>{{ craftById.get(track.craftId)!.registration }}</dd>
+                  </template>
+                </dl>
+              </div>
+            </template>
+          </UPopover>
+          <p v-else class="route-card__craft">{{ track.craftName }}</p>
           <p class="route-card__stats font-mono">
             {{ formatDistance(track.distanceKm) }} · {{ formatDuration(track.durationSec) }}
           </p>
@@ -47,27 +75,6 @@ const sortedTracks = computed(() =>
         </div>
       </div>
     </UCard>
-
-    <template v-if="craft.length > 0">
-      <p class="sidebar-list__heading">Craft</p>
-      <UCard v-for="c in craft" :key="c.id">
-        <div class="craft-card">
-          <p class="craft-card__name">{{ c.name }}</p>
-          <dl class="craft-card__details font-mono">
-            <dt>Type</dt>
-            <dd>{{ c.type }}</dd>
-            <dt>Make</dt>
-            <dd>{{ c.make }}</dd>
-            <dt v-if="c.model">Model</dt>
-            <dd v-if="c.model">{{ c.model }}</dd>
-            <dt>Colour</dt>
-            <dd>{{ c.colour }}</dd>
-            <dt v-if="c.registration">Reg.</dt>
-            <dd v-if="c.registration">{{ c.registration }}</dd>
-          </dl>
-        </div>
-      </UCard>
-    </template>
   </div>
 </template>
 
@@ -108,6 +115,25 @@ const sortedTracks = computed(() =>
   color: var(--ui-text-muted);
 }
 
+button.route-card__craft--link {
+  display: inline-block;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 0.15rem;
+  color: var(--ui-primary);
+}
+
+button.route-card__craft--link:hover,
+button.route-card__craft--link:focus-visible {
+  color: var(--ui-text-highlighted);
+}
+
 .route-card__stats {
   margin: 0.3rem 0 0;
   font-size: 0.75rem;
@@ -121,12 +147,17 @@ const sortedTracks = computed(() =>
   gap: 0.5rem;
 }
 
-.craft-card__name {
+.craft-popover {
+  padding: 0.75rem 1rem;
+  min-width: 12rem;
+}
+
+.craft-popover__name {
   margin: 0 0 0.4rem;
   font-weight: 600;
 }
 
-.craft-card__details {
+.craft-popover__details {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 0.15rem 0.75rem;
@@ -134,11 +165,11 @@ const sortedTracks = computed(() =>
   font-size: 0.8rem;
 }
 
-.craft-card__details dt {
+.craft-popover__details dt {
   color: var(--ui-text-muted);
 }
 
-.craft-card__details dd {
+.craft-popover__details dd {
   margin: 0;
 }
 </style>
