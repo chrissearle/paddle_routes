@@ -37,6 +37,44 @@ export function useTracks() {
     }),
   )
 
+  // Sidebar visibility/solo state — deliberately independent of the top filters.
+  // Toggling a track on/off, or soloing one, must not change `filteredTracks`
+  // (the list the sidebar renders) or trigger the map to re-fit bounds.
+  const hiddenIds = reactive(new Set<string>())
+  const soloId = ref<string>('')
+
+  watch(
+    filteredTracks,
+    (list) => {
+      const ids = new Set(list.map((t) => t.id))
+      for (const id of hiddenIds) if (!ids.has(id)) hiddenIds.delete(id)
+      if (soloId.value && !ids.has(soloId.value)) soloId.value = ''
+    },
+    { flush: 'sync' },
+  )
+
+  function isVisible(id: string): boolean {
+    if (soloId.value) return soloId.value === id
+    return !hiddenIds.has(id)
+  }
+
+  function toggleVisible(id: string) {
+    if (soloId.value) return
+    if (hiddenIds.has(id)) hiddenIds.delete(id)
+    else hiddenIds.add(id)
+  }
+
+  function toggleSolo(id: string) {
+    soloId.value = soloId.value === id ? '' : id
+  }
+
+  const displayedTracks = computed(() => filteredTracks.value.filter((t) => isVisible(t.id)))
+
+  const displayedCraft = computed(() => {
+    const ids = new Set(filteredTracks.value.map((t) => t.craftId))
+    return craft.value.filter((c) => ids.has(c.id))
+  })
+
   return {
     tracks,
     craft,
@@ -48,5 +86,11 @@ export function useTracks() {
     selectedArea,
     selectedDate,
     filteredTracks,
+    displayedTracks,
+    displayedCraft,
+    soloId,
+    isVisible,
+    toggleVisible,
+    toggleSolo,
   }
 }

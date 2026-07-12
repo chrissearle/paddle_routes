@@ -11,11 +11,11 @@ A Nuxt 4 app that plots [Paddle Logger](https://paddlelogger.com) GPX tracks on 
 
 ## Config files
 
-| File | Purpose |
-| --- | --- |
-| `data/craft.json` | Lookup list of craft: `id`, `name`, `type`, `make`, `model`, `colour`, `registration` |
+| File                | Purpose                                                                                                                |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `data/craft.json`   | Lookup list of craft: `id`, `name`, `type`, `make`, `model`, `colour`, `registration`                                  |
 | `data/regions.json` | Named bounding boxes (`minLat`/`maxLat`/`minLon`/`maxLon`) used to derive each track's region from its GPS start point |
-| `data/tracks.json` | Per-GPX-filename metadata: `craftId` (references `craft.json`), `area` (free text), optional `name` |
+| `data/tracks.json`  | Per-GPX-filename metadata: `craftId` (references `craft.json`), `area` (free text), optional `name`                    |
 
 Add a new track by dropping the `.gpx` file into `data/` and adding a matching entry to `data/tracks.json`. Tracks without a config entry still show up, labelled "Unknown" craft/area.
 

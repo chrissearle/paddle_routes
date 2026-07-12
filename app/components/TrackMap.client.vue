@@ -5,6 +5,7 @@ import type { TrackDetail, TrackSummary } from '#shared/types/track'
 
 const props = defineProps<{
   tracks: TrackSummary[]
+  visibleIds: string[]
 }>()
 
 const wrapperEl = ref<HTMLDivElement>()
@@ -12,6 +13,11 @@ const mapEl = ref<HTMLDivElement>()
 const colorMode = useColorMode()
 let map: L.Map | undefined
 const layers = new Map<string, L.Polyline>()
+
+// Coral reads well on the light basemap but loses contrast against the
+// hue-rotated dark tiles, and is hard to distinguish for red/green
+// colorblindness — amber is legible in both modes and colorblind-safe.
+const trackColor = computed(() => (colorMode.value === 'dark' ? '#ffc738' : '#ff6b4a'))
 
 onMounted(async () => {
   await nextTick()
@@ -24,14 +30,17 @@ onMounted(async () => {
     className: 'map-tiles',
   }).addTo(map)
 
-  syncTracks(props.tracks)
+  await syncLayers(props.tracks)
+  applyVisibility(props.visibleIds)
 })
 
 onBeforeUnmount(() => {
   map?.remove()
 })
 
-async function syncTracks(tracks: TrackSummary[]) {
+// Builds/removes polyline layers for the full filtered set and re-fits bounds.
+// Only the top filters change `tracks`, so this — and the fit — only runs then.
+async function syncLayers(tracks: TrackSummary[]) {
   if (!map) return
 
   const activeIds = new Set(tracks.map((t) => t.id))
@@ -46,7 +55,7 @@ async function syncTracks(tracks: TrackSummary[]) {
     if (layers.has(track.id)) continue
     const detail = await $fetch<TrackDetail>(`/api/tracks/${track.id}`)
     const latLngs = detail.points.map((p) => [p.lat, p.lon] as [number, number])
-    const polyline = L.polyline(latLngs, { color: '#ff6b4a', weight: 3 }).addTo(map)
+    const polyline = L.polyline(latLngs, { color: trackColor.value, weight: 3 })
     polyline.bindPopup(`${detail.name} — ${detail.distanceKm.toFixed(1)} km`)
     layers.set(track.id, polyline)
   }
@@ -57,9 +66,27 @@ async function syncTracks(tracks: TrackSummary[]) {
     for (const b of allBounds.slice(1)) bounds = bounds.extend(b)
     map.fitBounds(bounds, { padding: [24, 24] })
   }
+
+  applyVisibility(props.visibleIds)
 }
 
-watch(() => props.tracks, syncTracks, { deep: false })
+// Shows/hides layers per the sidebar's toggle/solo state. Never touches bounds.
+function applyVisibility(visibleIds: string[]) {
+  if (!map) return
+  const visible = new Set(visibleIds)
+  for (const [id, layer] of layers) {
+    const shouldShow = visible.has(id)
+    const onMap = map.hasLayer(layer)
+    if (shouldShow && !onMap) layer.addTo(map)
+    else if (!shouldShow && onMap) layer.remove()
+  }
+}
+
+watch(() => props.tracks, syncLayers, { deep: false })
+watch(() => props.visibleIds, applyVisibility, { deep: false })
+watch(trackColor, (color) => {
+  for (const layer of layers.values()) layer.setStyle({ color })
+})
 </script>
 
 <template>
