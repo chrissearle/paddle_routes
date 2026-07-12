@@ -19,7 +19,7 @@ export function useTracks() {
   const dateOptions = computed(() => {
     const seen = new Set<string>()
     for (const t of tracks.value) seen.add(t.date)
-    return [...seen].sort()
+    return [...seen].sort().reverse()
   })
 
   const selectedCraftId = ref<string>('')
@@ -75,6 +75,23 @@ export function useTracks() {
     return craft.value.filter((c) => ids.has(c.id))
   })
 
+  // Which track ids currently intersect the map's viewport, as reported by
+  // TrackMap on mount/pan/zoom. `null` means "not yet constrained" (before
+  // the map has reported its first bounds), so nothing is hidden prematurely.
+  const viewportIds = ref<Set<string> | null>(null)
+  function setViewportIds(ids: string[]) {
+    viewportIds.value = new Set(ids)
+  }
+
+  // Filter-matched and currently on-screen. Deliberately not further filtered
+  // by `isVisible` — hidden/soloed tracks must stay in the list (greyed out)
+  // so they can still be toggled back on.
+  const sidebarTracks = computed(() =>
+    viewportIds.value === null
+      ? filteredTracks.value
+      : filteredTracks.value.filter((t) => viewportIds.value!.has(t.id)),
+  )
+
   return {
     tracks,
     craft,
@@ -88,6 +105,8 @@ export function useTracks() {
     filteredTracks,
     displayedTracks,
     displayedCraft,
+    sidebarTracks,
+    setViewportIds,
     soloId,
     isVisible,
     toggleVisible,

@@ -11,6 +11,8 @@ const {
   filteredTracks,
   displayedTracks,
   displayedCraft,
+  sidebarTracks,
+  setViewportIds,
   soloId,
   isVisible,
   toggleVisible,
@@ -18,15 +20,16 @@ const {
 } = useTracks()
 
 const totalDistanceKm = computed(() =>
-  filteredTracks.value.reduce((sum, t) => sum + t.distanceKm, 0),
+  sidebarTracks.value.reduce((sum, t) => sum + t.distanceKm, 0),
 )
 
 const totalDurationHours = computed(
-  () => filteredTracks.value.reduce((sum, t) => sum + t.durationSec, 0) / 3600,
+  () => sidebarTracks.value.reduce((sum, t) => sum + t.durationSec, 0) / 3600,
 )
 
 const visibleIds = computed(() => displayedTracks.value.map((t) => t.id))
 
+const isWide = useIsWide()
 const sidebarOpen = ref(false)
 function toggleSidebar() {
   sidebarOpen.value = !sidebarOpen.value
@@ -47,6 +50,7 @@ function toggleSidebar() {
         :date-options="dateOptions"
       />
       <UButton
+        v-if="!isWide"
         icon="i-lucide-list"
         color="neutral"
         variant="ghost"
@@ -56,22 +60,29 @@ function toggleSidebar() {
     </div>
 
     <div class="readout font-mono">
-      <span>{{ String(filteredTracks.length).padStart(2, '0') }} ROUTES</span>
+      <span>{{ String(sidebarTracks.length).padStart(2, '0') }} ROUTES</span>
       <span>{{ totalDistanceKm.toFixed(1) }} KM</span>
       <span>{{ totalDurationHours.toFixed(1) }} H</span>
     </div>
 
-    <TrackMap :tracks="filteredTracks" :visible-ids="visibleIds" class="map" />
+    <div class="main">
+      <TrackMap
+        :tracks="filteredTracks"
+        :visible-ids="visibleIds"
+        class="map"
+        @viewport-change="setViewportIds"
+      />
 
-    <TrackSidebar
-      v-model:open="sidebarOpen"
-      :tracks="filteredTracks"
-      :craft="displayedCraft"
-      :solo-id="soloId"
-      :is-visible="isVisible"
-      :toggle-visible="toggleVisible"
-      :toggle-solo="toggleSolo"
-    />
+      <TrackSidebar
+        v-model:open="sidebarOpen"
+        :tracks="sidebarTracks"
+        :craft="displayedCraft"
+        :solo-id="soloId"
+        :is-visible="isVisible"
+        :toggle-visible="toggleVisible"
+        :toggle-solo="toggleSolo"
+      />
+    </div>
   </div>
 </template>
 
@@ -101,6 +112,12 @@ function toggleSidebar() {
   letter-spacing: 0.04em;
   color: var(--ui-text-muted);
   border-bottom: 1px solid var(--ui-border);
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
 }
 
 .map {

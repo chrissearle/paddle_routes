@@ -8,6 +8,10 @@ const props = defineProps<{
   visibleIds: string[]
 }>()
 
+const emit = defineEmits<{
+  'viewport-change': [ids: string[]]
+}>()
+
 const wrapperEl = ref<HTMLDivElement>()
 const mapEl = ref<HTMLDivElement>()
 const colorMode = useColorMode()
@@ -30,8 +34,11 @@ onMounted(async () => {
     className: 'map-tiles',
   }).addTo(map)
 
+  map.on('moveend', updateViewportIds)
+
   await syncLayers(props.tracks)
   applyVisibility(props.visibleIds)
+  updateViewportIds()
 })
 
 onBeforeUnmount(() => {
@@ -80,6 +87,18 @@ function applyVisibility(visibleIds: string[]) {
     if (shouldShow && !onMap) layer.addTo(map)
     else if (!shouldShow && onMap) layer.remove()
   }
+}
+
+// Reports which layers currently intersect the visible map viewport, for
+// panning/zooming to narrow the sidebar list — separate from `applyVisibility`,
+// which controls which layers are drawn on the map at all.
+function updateViewportIds() {
+  if (!map) return
+  const bounds = map.getBounds()
+  const ids = [...layers.entries()]
+    .filter(([, layer]) => bounds.intersects(layer.getBounds()))
+    .map(([id]) => id)
+  emit('viewport-change', ids)
 }
 
 watch(() => props.tracks, syncLayers, { deep: false })
