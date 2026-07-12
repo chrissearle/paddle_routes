@@ -11,7 +11,10 @@ function toggleColorMode() {
     <NuxtRouteAnnouncer />
     <div class="app-shell">
       <header class="app-header">
-        <h1 class="font-display">Paddle tracks</h1>
+        <div class="app-header__title">
+          <AppLogo />
+          <h1 class="font-display">Paddle routes</h1>
+        </div>
         <UButton
           :icon="colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'"
           color="neutral"
@@ -38,6 +41,12 @@ function toggleColorMode() {
   justify-content: space-between;
   padding: 0.85rem 1.25rem;
   border-bottom: 1px solid var(--ui-border);
+}
+
+.app-header__title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 
 .app-header h1 {

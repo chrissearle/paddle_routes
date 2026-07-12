@@ -56,7 +56,7 @@ function toggleSidebar() {
     </div>
 
     <div class="readout font-mono">
-      <span>{{ String(filteredTracks.length).padStart(2, '0') }} TRACKS</span>
+      <span>{{ String(filteredTracks.length).padStart(2, '0') }} ROUTES</span>
       <span>{{ totalDistanceKm.toFixed(1) }} KM</span>
       <span>{{ totalDurationHours.toFixed(1) }} H</span>
     </div>
