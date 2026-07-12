@@ -1,0 +1,12 @@
+[
+  {
+    "id": "halden",
+    "name": "Halden, Norway",
+    "bounds": {
+      "minLat": 59.0,
+      "maxLat": 59.3,
+      "minLon": 11.3,
+      "maxLon": 11.7
+    }
+  }
+]

@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import 'tailwindcss';
+@import '@nuxt/ui';
+
+:root {
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@theme static {
+  --color-water-50: #eefbfa;
+  --color-water-100: #d3f4f0;
+  --color-water-200: #a6e8e1;
+  --color-water-300: #6fd6cb;
+  --color-water-400: #3cbfb1;
+  --color-water-500: #29d9c2;
+  --color-water-600: #1aa393;
+  --color-water-700: #157e73;
+  --color-water-800: #14655e;
+  --color-water-900: #14534e;
+  --color-water-950: #06302d;
+
+  --color-course-50: #fff1ec;
+  --color-course-100: #ffe0d4;
+  --color-course-200: #ffbea8;
+  --color-course-300: #ff9670;
+  --color-course-400: #ff6b4a;
+  --color-course-500: #e85a3b;
+  --color-course-600: #c94528;
+  --color-course-700: #a3371f;
+  --color-course-800: #7c2a18;
+  --color-course-900: #5c2013;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--ui-bg);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
