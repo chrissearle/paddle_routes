@@ -19,4 +19,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     dataDir: process.env.DATA_DIR || './data',
   },
+  vite: {
+    optimizeDeps: {
+      include: ['leaflet'],
+    },
+  },
 })
