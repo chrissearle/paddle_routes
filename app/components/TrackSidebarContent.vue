@@ -26,7 +26,7 @@ const craftById = computed(() => new Map(props.craft.map((c) => [c.id, c])))
     >
       <div class="route-card">
         <div class="route-card__info">
-          <p class="route-card__date font-mono">{{ track.date }}</p>
+          <p class="route-card__date font-mono text-secondary">{{ track.date }}</p>
           <UPopover v-if="craftById.get(track.craftId)" mode="click">
             <button type="button" class="route-card__craft route-card__craft--link">
               {{ track.craftName }}
