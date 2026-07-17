@@ -92,11 +92,16 @@ function applyVisibility(visibleIds: string[]) {
 // Reports which layers currently intersect the visible map viewport, for
 // panning/zooming to narrow the sidebar list — separate from `applyVisibility`,
 // which controls which layers are drawn on the map at all.
+//
+// Checked against actual track points rather than each layer's bounding box:
+// a long or winding track's bbox can span far beyond its line (e.g. a route
+// that runs east also drags the bbox west), which caused unrelated tracks to
+// be reported as "visible" just because the viewport overlapped that bbox.
 function updateViewportIds() {
   if (!map) return
   const bounds = map.getBounds()
   const ids = [...layers.entries()]
-    .filter(([, layer]) => bounds.intersects(layer.getBounds()))
+    .filter(([, layer]) => (layer.getLatLngs() as L.LatLng[]).some((ll) => bounds.contains(ll)))
     .map(([id]) => id)
   emit('viewport-change', ids)
 }

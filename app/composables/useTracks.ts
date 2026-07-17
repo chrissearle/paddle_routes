@@ -92,6 +92,10 @@ export function useTracks() {
       : filteredTracks.value.filter((t) => viewportIds.value!.has(t.id)),
   )
 
+  // On-screen (viewport) and actually visible (not hidden/soloed-out) —
+  // what the top readout's totals should reflect.
+  const visibleSidebarTracks = computed(() => sidebarTracks.value.filter((t) => isVisible(t.id)))
+
   return {
     tracks,
     craft,
@@ -106,6 +110,7 @@ export function useTracks() {
     displayedTracks,
     displayedCraft,
     sidebarTracks,
+    visibleSidebarTracks,
     setViewportIds,
     soloId,
     isVisible,

@@ -12,6 +12,7 @@ const {
   displayedTracks,
   displayedCraft,
   sidebarTracks,
+  visibleSidebarTracks,
   setViewportIds,
   soloId,
   isVisible,
@@ -20,11 +21,11 @@ const {
 } = useTracks()
 
 const totalDistanceKm = computed(() =>
-  sidebarTracks.value.reduce((sum, t) => sum + t.distanceKm, 0),
+  visibleSidebarTracks.value.reduce((sum, t) => sum + t.distanceKm, 0),
 )
 
 const totalDurationHours = computed(
-  () => sidebarTracks.value.reduce((sum, t) => sum + t.durationSec, 0) / 3600,
+  () => visibleSidebarTracks.value.reduce((sum, t) => sum + t.durationSec, 0) / 3600,
 )
 
 const visibleIds = computed(() => displayedTracks.value.map((t) => t.id))
@@ -60,7 +61,7 @@ function toggleSidebar() {
     </div>
 
     <div class="readout font-mono">
-      <span>{{ String(sidebarTracks.length).padStart(2, '0') }} ROUTES</span>
+      <span>{{ String(visibleSidebarTracks.length).padStart(2, '0') }} ROUTES</span>
       <span>{{ totalDistanceKm.toFixed(1) }} KM</span>
       <span>{{ totalDurationHours.toFixed(1) }} H</span>
     </div>
