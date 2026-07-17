@@ -24,12 +24,13 @@ export interface RegionDef {
 }
 
 export interface TrackConfigEntry {
+  filename: string
   craftId: string
   area?: string
   name?: string
 }
 
-export type TrackConfig = Record<string, TrackConfigEntry>
+export type TrackConfig = TrackConfigEntry[]
 
 export interface TrackPoint {
   lat: number

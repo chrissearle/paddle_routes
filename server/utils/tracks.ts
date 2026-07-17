@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { useRuntimeConfig } from '#imports'
 import { parseGpx } from './gpx'
 import { trackDistanceKm, findRegion } from './geo'
-import type { Craft, RegionDef, TrackConfig, TrackDetail, TrackSummary } from '#shared/types/track'
+import type { Craft, RegionDef, TrackConfigEntry, TrackDetail, TrackSummary } from '#shared/types/track'
 
 const UNKNOWN_REGION: RegionDef = {
   id: 'unknown',
@@ -33,8 +33,9 @@ async function loadRegions(): Promise<RegionDef[]> {
   return readJson<RegionDef[]>(join(dataDir(), 'regions.json'), [])
 }
 
-async function loadTrackConfig(): Promise<TrackConfig> {
-  return readJson<TrackConfig>(join(dataDir(), 'tracks.json'), {})
+async function loadTrackConfig(): Promise<Map<string, TrackConfigEntry>> {
+  const list = await readJson<TrackConfigEntry[]>(join(dataDir(), 'tracks.json'), [])
+  return new Map(list.map((entry) => [entry.filename, entry]))
 }
 
 async function listGpxFiles(): Promise<string[]> {
@@ -51,12 +52,12 @@ async function buildDetail(
   filename: string,
   craftMap: Map<string, Craft>,
   regions: RegionDef[],
-  config: TrackConfig,
+  config: Map<string, TrackConfigEntry>,
 ): Promise<TrackDetail> {
   const xml = await readFile(join(dataDir(), filename), 'utf-8')
   const { points } = parseGpx(xml)
 
-  const entry = config[filename]
+  const entry = config.get(filename)
   const craft = entry ? craftMap.get(entry.craftId) : undefined
   const region = points.length > 0 ? (findRegion(points[0]!, regions) ?? UNKNOWN_REGION) : UNKNOWN_REGION
 
