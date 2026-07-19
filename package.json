@@ -21,7 +21,7 @@
     "fast-xml-parser": "5.10.0",
     "leaflet": "1.9.4",
     "nuxt": "4.4.8",
-    "vue": "3.5.39",
+    "vue": "3.5.40",
     "vue-router": "5.2.0"
   },
   "devDependencies": {
