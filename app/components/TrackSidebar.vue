@@ -8,6 +8,7 @@ defineProps<{
   isVisible: (id: string) => boolean
   toggleVisible: (id: string) => void
   toggleSolo: (id: string) => void
+  copyTrackLink: (id: string) => void
 }>()
 
 const open = defineModel<boolean>('open', { required: true })
@@ -25,6 +26,7 @@ const isWide = useIsWide()
         :is-visible="isVisible"
         :toggle-visible="toggleVisible"
         :toggle-solo="toggleSolo"
+        :copy-track-link="copyTrackLink"
       />
     </template>
   </USlideover>
@@ -37,6 +39,7 @@ const isWide = useIsWide()
       :is-visible="isVisible"
       :toggle-visible="toggleVisible"
       :toggle-solo="toggleSolo"
+      :copy-track-link="copyTrackLink"
     />
   </aside>
 </template>

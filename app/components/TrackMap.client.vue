@@ -37,7 +37,6 @@ onMounted(async () => {
   map.on('moveend', updateViewportIds)
 
   await syncLayers(props.tracks)
-  applyVisibility(props.visibleIds)
   updateViewportIds()
 })
 
@@ -45,8 +44,9 @@ onBeforeUnmount(() => {
   map?.remove()
 })
 
-// Builds/removes polyline layers for the full filtered set and re-fits bounds.
-// Only the top filters change `tracks`, so this — and the fit — only runs then.
+// Builds/removes polyline layers for the full filtered set. Bounds are fit
+// separately in `applyVisibility`, called at the end of this function once
+// the new layers exist.
 async function syncLayers(tracks: TrackSummary[]) {
   if (!map) return
 
@@ -67,25 +67,29 @@ async function syncLayers(tracks: TrackSummary[]) {
     layers.set(track.id, polyline)
   }
 
-  const allBounds = [...layers.values()].map((l) => l.getBounds())
-  if (allBounds.length > 0) {
-    let bounds = allBounds[0]!
-    for (const b of allBounds.slice(1)) bounds = bounds.extend(b)
-    map.fitBounds(bounds, { padding: [24, 24] })
-  }
-
   applyVisibility(props.visibleIds)
 }
 
-// Shows/hides layers per the sidebar's toggle/solo state. Never touches bounds.
+// Shows/hides layers per the sidebar's toggle/solo state, and fits the map
+// to whichever layers end up visible — so the map always zooms to match
+// whatever the sidebar currently shows, whether that came from the top
+// filters, a solo, a manual toggle-off, or a restored permalink.
 function applyVisibility(visibleIds: string[]) {
   if (!map) return
   const visible = new Set(visibleIds)
+  const shownLayers: L.Polyline[] = []
   for (const [id, layer] of layers) {
     const shouldShow = visible.has(id)
     const onMap = map.hasLayer(layer)
     if (shouldShow && !onMap) layer.addTo(map)
     else if (!shouldShow && onMap) layer.remove()
+    if (shouldShow) shownLayers.push(layer)
+  }
+
+  if (shownLayers.length > 0) {
+    let bounds = shownLayers[0]!.getBounds()
+    for (const layer of shownLayers.slice(1)) bounds = bounds.extend(layer.getBounds())
+    map.fitBounds(bounds, { padding: [24, 24] })
   }
 }
 

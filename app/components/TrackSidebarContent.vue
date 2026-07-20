@@ -8,6 +8,7 @@ const props = defineProps<{
   isVisible: (id: string) => boolean
   toggleVisible: (id: string) => void
   toggleSolo: (id: string) => void
+  copyTrackLink: (id: string) => void
 }>()
 
 const sortedTracks = computed(() =>
@@ -65,13 +66,23 @@ const craftById = computed(() => new Map(props.craft.map((c) => [c.id, c])))
             aria-label="Toggle route visibility"
             @update:model-value="toggleVisible(track.id)"
           />
-          <UButton
-            :label="soloId === track.id ? 'Unsolo' : 'Solo'"
-            size="xs"
-            :color="soloId === track.id ? 'secondary' : 'neutral'"
-            :variant="soloId === track.id ? 'solid' : 'outline'"
-            @click="toggleSolo(track.id)"
-          />
+          <div class="route-card__actions-row">
+            <UButton
+              :label="soloId === track.id ? 'Unsolo' : 'Solo'"
+              size="xs"
+              :color="soloId === track.id ? 'secondary' : 'neutral'"
+              :variant="soloId === track.id ? 'solid' : 'outline'"
+              @click="toggleSolo(track.id)"
+            />
+            <UButton
+              icon="i-lucide-link"
+              size="xs"
+              color="neutral"
+              variant="ghost"
+              aria-label="Copy permalink to this route"
+              @click="copyTrackLink(track.id)"
+            />
+          </div>
         </div>
       </div>
     </UCard>
@@ -145,6 +156,12 @@ button.route-card__craft--link:focus-visible {
   flex-direction: column;
   align-items: flex-end;
   gap: 0.5rem;
+}
+
+.route-card__actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .craft-popover {

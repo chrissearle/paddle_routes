@@ -18,6 +18,7 @@ const {
   isVisible,
   toggleVisible,
   toggleSolo,
+  copyTrackLink,
 } = useTracks()
 
 const totalDistanceKm = computed(() =>
@@ -82,6 +83,7 @@ function toggleSidebar() {
         :is-visible="isVisible"
         :toggle-visible="toggleVisible"
         :toggle-solo="toggleSolo"
+        :copy-track-link="copyTrackLink"
       />
     </div>
   </div>

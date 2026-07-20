@@ -4,6 +4,9 @@ export function useTracks() {
   const { data: tracks } = useFetch<TrackSummary[]>('/api/tracks', { default: () => [] })
   const { data: craft } = useFetch<Craft[]>('/api/craft', { default: () => [] })
 
+  const route = useRoute()
+  const toast = useToast()
+
   const regionOptions = computed(() => {
     const seen = new Map<string, string>()
     for (const t of tracks.value) seen.set(t.regionId, t.regionName)
@@ -41,7 +44,13 @@ export function useTracks() {
   // Toggling a track on/off, or soloing one, must not change `filteredTracks`
   // (the list the sidebar renders) or trigger the map to re-fit bounds.
   const hiddenIds = reactive(new Set<string>())
-  const soloId = ref<string>('')
+  // Seeded synchronously from `?track=<filename>` — safe even before `tracks`
+  // has loaded, since an id that turns out to be invalid is cleared by the
+  // `filteredTracks` watcher below once the real list arrives. Doing this
+  // synchronously (rather than waiting on the fetch) keeps SSR and client
+  // renders identical, avoiding a hydration mismatch.
+  const rawTrackParam = route.query.track
+  const soloId = ref<string>(Array.isArray(rawTrackParam) ? (rawTrackParam[0] ?? '') : (rawTrackParam ?? ''))
 
   watch(
     filteredTracks,
@@ -66,6 +75,14 @@ export function useTracks() {
 
   function toggleSolo(id: string) {
     soloId.value = soloId.value === id ? '' : id
+  }
+
+  function copyTrackLink(id: string) {
+    const url = `${window.location.origin}${route.path}?track=${encodeURIComponent(id)}`
+    navigator.clipboard
+      .writeText(url)
+      .then(() => toast.add({ title: 'Link copied', color: 'success' }))
+      .catch(() => toast.add({ title: 'Could not copy link', color: 'error' }))
   }
 
   const displayedTracks = computed(() => filteredTracks.value.filter((t) => isVisible(t.id)))
@@ -116,5 +133,6 @@ export function useTracks() {
     isVisible,
     toggleVisible,
     toggleSolo,
+    copyTrackLink,
   }
 }
