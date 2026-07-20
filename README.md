@@ -2,6 +2,8 @@
 
 A Nuxt 4 app that plots [Paddle Logger](https://paddlelogger.com) GPX tracks on a map, with drill-downs by craft, region, area, and date.
 
+Live site: https://paddle-routes.chrissearle.org/
+
 ## How it works
 
 - GPX files live in `data/` (or wherever `DATA_DIR` points) and are parsed on request — no build step needed to pick up a new track.

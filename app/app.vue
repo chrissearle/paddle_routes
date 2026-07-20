@@ -15,13 +15,23 @@ function toggleColorMode() {
           <AppLogo />
           <h1 class="font-display">Paddle routes</h1>
         </div>
-        <UButton
-          :icon="colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'"
-          color="neutral"
-          variant="ghost"
-          aria-label="Toggle dark mode"
-          @click="toggleColorMode"
-        />
+        <div class="app-header__actions">
+          <UButton
+            icon="i-lucide-github"
+            color="neutral"
+            variant="ghost"
+            to="https://github.com/chrissearle/paddle_routes"
+            target="_blank"
+            aria-label="View source on GitHub"
+          />
+          <UButton
+            :icon="colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'"
+            color="neutral"
+            variant="ghost"
+            aria-label="Toggle dark mode"
+            @click="toggleColorMode"
+          />
+        </div>
       </header>
       <NuxtPage />
     </div>
@@ -47,6 +57,12 @@ function toggleColorMode() {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .app-header h1 {
