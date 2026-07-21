@@ -1,6 +1,8 @@
 <script setup lang="ts">
 const {
   craft,
+  geometry,
+  geometryPending,
   regionOptions,
   areaOptions,
   dateOptions,
@@ -71,6 +73,8 @@ function toggleSidebar() {
       <TrackMap
         :tracks="filteredTracks"
         :visible-ids="visibleIds"
+        :geometry="geometry"
+        :pending="geometryPending"
         class="map"
         @viewport-change="setViewportIds"
       />

@@ -2,7 +2,7 @@ import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { parseGpx } from './gpx'
 import { trackDistanceKm, findRegion } from './geo'
-import type { Craft, RegionDef, TrackConfigEntry, TrackDetail } from '#shared/types/track'
+import type { Craft, EncodedPoint, RegionDef, TrackConfigEntry, TrackDetail, TrackPoint } from '#shared/types/track'
 
 // Pure, Nuxt-context-free GPX parsing shared by the Nitro server
 // (server/utils/tracks.ts) and the build-time cache generator
@@ -48,6 +48,28 @@ function dateFromFilename(filename: string): string {
   return match ? match[1]! : filename
 }
 
+const COORD_DP = 5
+
+function round(n: number): number {
+  return Math.round(n * 10 ** COORD_DP) / 10 ** COORD_DP
+}
+
+// Converts full-precision points to the compact wire format. Timestamps become
+// deltas from the previous point, which for this data (~1Hz sampling) means a
+// 3-4 digit integer per point instead of a 24-char ISO string.
+//
+// Points without a parseable time contribute a 0 delta rather than NaN, so a
+// partially-timed track still decodes to a monotonic (if flat) timeline.
+export function encodePoints(points: TrackPoint[]): EncodedPoint[] {
+  let prev = 0
+  return points.map((p, i) => {
+    const t = p.time ? Date.parse(p.time) : 0
+    const delta = i === 0 || !t || !prev ? 0 : t - prev
+    if (t) prev = t
+    return [round(p.lat), round(p.lon), delta]
+  })
+}
+
 export async function buildDetail(
   dir: string,
   filename: string,
@@ -81,6 +103,7 @@ export async function buildDetail(
     regionName: region.name,
     distanceKm: trackDistanceKm(points),
     durationSec,
-    points,
+    // Encoded last, so every metric above is derived from full precision.
+    pts: encodePoints(points),
   }
 }

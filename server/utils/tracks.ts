@@ -1,7 +1,14 @@
 import { join } from 'node:path'
 import { useRuntimeConfig } from '#imports'
 import { buildDetail, listGpxFiles, loadCraft, loadRegions, loadTrackConfig, readJson } from './track-parse'
-import type { Craft, RegionDef, TrackConfigEntry, TrackDetail, TrackSummary } from '#shared/types/track'
+import type {
+  Craft,
+  EncodedPoint,
+  RegionDef,
+  TrackConfigEntry,
+  TrackDetail,
+  TrackSummary,
+} from '#shared/types/track'
 
 function dataDir(): string {
   return useRuntimeConfig().dataDir
@@ -38,7 +45,22 @@ export async function listTrackSummaries(): Promise<TrackSummary[]> {
   ])
 
   const details = await Promise.all(files.map((f) => getOrBuildDetail(dir, f, craftMap, regions, config)))
-  return details.map(({ points: _points, ...summary }) => summary)
+  return details.map(({ pts: _pts, ...summary }) => summary)
+}
+
+// Geometry for every track in one payload. Deliberately unfiltered: the client
+// fetches this once and filters locally, so changing a filter costs no network.
+export async function listTrackGeometry(): Promise<Record<string, EncodedPoint[]>> {
+  const dir = dataDir()
+  const [files, craftMap, regions, config] = await Promise.all([
+    listGpxFiles(dir),
+    loadCraft(dir),
+    loadRegions(dir),
+    loadTrackConfig(dir),
+  ])
+
+  const details = await Promise.all(files.map((f) => getOrBuildDetail(dir, f, craftMap, regions, config)))
+  return Object.fromEntries(details.map((d) => [d.id, d.pts]))
 }
 
 export async function getTrackDetail(id: string): Promise<TrackDetail | undefined> {

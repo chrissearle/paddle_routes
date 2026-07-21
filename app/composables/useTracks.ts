@@ -1,8 +1,20 @@
-import type { Craft, TrackSummary } from '#shared/types/track'
+import type { Craft, EncodedPoint, TrackSummary } from '#shared/types/track'
 
 export function useTracks() {
   const { data: tracks } = useFetch<TrackSummary[]>('/api/tracks', { default: () => [] })
   const { data: craft } = useFetch<Craft[]>('/api/craft', { default: () => [] })
+
+  // All track geometry in one request, fetched once and filtered client-side —
+  // so changing a filter redraws with zero network.
+  //
+  // `server: false` keeps this bulk payload out of the SSR HTML, and `lazy`
+  // keeps it from blocking hydration. Starting it here rather than inside
+  // TrackMap matters: the request overlaps with the Leaflet chunk download and
+  // hydration instead of queueing behind them.
+  const { data: geometry, pending: geometryPending } = useFetch<Record<string, EncodedPoint[]>>(
+    '/api/tracks/points',
+    { default: () => ({}), lazy: true, server: false },
+  )
 
   const route = useRoute()
   const toast = useToast()
@@ -116,6 +128,8 @@ export function useTracks() {
   return {
     tracks,
     craft,
+    geometry,
+    geometryPending,
     regionOptions,
     areaOptions,
     dateOptions,
