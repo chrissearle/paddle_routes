@@ -21,7 +21,7 @@
     "@nuxt/ui": "4.10.0",
     "fast-xml-parser": "5.10.1",
     "leaflet": "1.9.4",
-    "nuxt": "4.4.8",
+    "nuxt": "4.5.0",
     "vue": "3.5.40",
     "vue-router": "5.2.0"
   },
