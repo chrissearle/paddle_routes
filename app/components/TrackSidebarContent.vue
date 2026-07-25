@@ -96,14 +96,6 @@ const craftById = computed(() => new Map(props.craft.map((c) => [c.id, c])))
   gap: 0.6rem;
 }
 
-.sidebar-list__heading {
-  margin: 0.5rem 0 0;
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ui-text-muted);
-}
-
 .route-card--hidden {
   opacity: 0.5;
 }

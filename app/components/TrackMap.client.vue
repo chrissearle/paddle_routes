@@ -37,7 +37,11 @@ onMounted(async () => {
   await nextTick()
   if (!mapEl.value) return
 
-  map = L.map(mapEl.value).setView([59.16, 11.48], 12)
+  // Fallback framing only. As soon as geometry arrives, `applyVisibility`
+  // fitBounds() to the actual tracks, so this is what shows behind the loading
+  // skeleton and if there are zero tracks — deliberately data-agnostic rather
+  // than pinned to any one region.
+  map = L.map(mapEl.value).setView([20, 0], 2)
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19,

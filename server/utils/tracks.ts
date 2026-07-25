@@ -14,7 +14,7 @@ function dataDir(): string {
   return useRuntimeConfig().dataDir
 }
 
-// Pre-parsed cache written by scripts/build-track-cache.mjs at image build
+// Pre-parsed cache written by scripts/build-track-cache.ts at image build
 // time. Loaded once per process; a cache miss (local dev without the build
 // step, or a track added since the last build) falls back to live parsing.
 let cachePromise: Promise<Record<string, TrackDetail>> | undefined

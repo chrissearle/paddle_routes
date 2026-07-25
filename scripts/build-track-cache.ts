@@ -1,6 +1,7 @@
 import { writeFile, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
-import { buildDetail, listGpxFiles, loadCraft, loadRegions, loadTrackConfig } from '../server/utils/track-parse.js'
+import { buildDetail, listGpxFiles, loadCraft, loadRegions, loadTrackConfig } from '../server/utils/track-parse'
+import type { TrackDetail } from '../shared/types/track'
 
 const dataDir = process.env.DATA_DIR || './data'
 
@@ -12,7 +13,10 @@ const [files, craftMap, regions, config] = await Promise.all([
 ])
 
 const entries = await Promise.all(
-  files.map(async (filename) => [filename, await buildDetail(dataDir, filename, craftMap, regions, config)]),
+  files.map(async (filename): Promise<[string, TrackDetail]> => [
+    filename,
+    await buildDetail(dataDir, filename, craftMap, regions, config),
+  ]),
 )
 
 const cacheDir = join(dataDir, '.cache')

@@ -34,7 +34,7 @@ Data dir must be passed as env. It is ok to default to ./data for development.
 
 ## Current implementation
 
-- **UI:** Nuxt UI (v4) with a custom "water/course" theme (teal primary, coral secondary), dark mode by default with a header toggle. Display font Space Grotesk, body Inter, mono JetBrains Mono for the stats readout — self-hosted via `@nuxt/fonts` (no third-party `@import`, which would block first paint).
+- **UI:** Nuxt UI (v4), primary `violet` / secondary `amber` / neutral `zinc` (`app/app.config.ts`), dark mode by default with a header toggle. A custom "water/course" teal/coral palette is defined in `app/assets/css/main.css` (`--color-water-*` / `--color-course-*`) but is not currently wired to the UI colors. Display font Space Grotesk, body Inter, mono JetBrains Mono for the stats readout — self-hosted via `@nuxt/fonts` (no third-party `@import`, which would block first paint).
 - **Map:** Leaflet + standard OpenStreetMap tiles, CSS `filter` applied to tiles in dark mode for visual cohesion (no separate paid dark-tile provider).
 - **Data flow:** GPX files are parsed from `runtimeConfig.dataDir` (`DATA_DIR` env, default `./data`) by `scripts/build-track-cache.mjs` at build time (`pnpm cache:tracks`, run by `pnpm build`) into `data/.cache/tracks.json`, loaded once per process. A cache miss falls back to live parsing, so local dev works without the build step.
 - **Track geometry wire format:** points ship as `EncodedPoint = [lat, lon, deltaMs]` — `deltaMs` is elapsed ms since the previous point, so timestamps reconstruct exactly as a running sum from the track's `startTime` (verified lossless across all points). `ele` is dropped (always 0 in this data). Coordinates are rounded to 5 decimals (~1.1m).

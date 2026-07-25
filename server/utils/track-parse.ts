@@ -6,8 +6,8 @@ import type { Craft, EncodedPoint, RegionDef, TrackConfigEntry, TrackDetail, Tra
 
 // Pure, Nuxt-context-free GPX parsing shared by the Nitro server
 // (server/utils/tracks.ts) and the build-time cache generator
-// (scripts/build-track-cache.mjs), which runs as a plain Node script with
-// no access to Nuxt auto-imports like `#imports`.
+// (scripts/build-track-cache.ts), which runs via tsx as a standalone script
+// with no access to Nuxt auto-imports like `#imports`.
 
 const UNKNOWN_REGION: RegionDef = {
   id: 'unknown',

@@ -15,6 +15,26 @@ permissions:
   packages: write
 
 jobs:
+  # Pushes to main don't go through the PR check, so run lint + typecheck here
+  # too — otherwise a broken typecheck (which `nuxt build` does not catch) can
+  # ship straight to an image.
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Setup mise
+        uses: jdx/mise-action@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
   meta:
     runs-on: ubuntu-latest
     outputs:
@@ -42,7 +62,7 @@ jobs:
 
   build-amd64:
     runs-on: ubuntu-latest
-    needs: meta
+    needs: [check, meta]
     env:
       IMAGE_BASE: ghcr.io/${{ github.repository_owner }}/paddle-routes
       SHORT_SHA_TAG: ${{ needs.meta.outputs.short_sha_tag }}
@@ -74,7 +94,7 @@ jobs:
 
   build-arm64:
     runs-on: ubuntu-24.04-arm
-    needs: meta
+    needs: [check, meta]
     env:
       IMAGE_BASE: ghcr.io/${{ github.repository_owner }}/paddle-routes
       SHORT_SHA_TAG: ${{ needs.meta.outputs.short_sha_tag }}

@@ -1,0 +1,21 @@
+# Reproduce the image from source only — never copy host build artifacts or
+# host-platform node_modules over what the build stage installs/generates.
+node_modules
+.nuxt
+.nitro
+.output
+.data
+data/.cache
+dist
+
+.git
+.github
+.husky
+.fleet
+.idea
+.vscode
+
+*.log
+.DS_Store
+.env
+.env.*

@@ -6,7 +6,7 @@ Live site: https://paddle-routes.chrissearle.org/
 
 ## How it works
 
-- GPX files live in `data/` (or wherever `DATA_DIR` points) and are parsed on request — no build step needed to pick up a new track.
+- GPX files live in `data/` (or wherever `DATA_DIR` points). They're pre-parsed into `data/.cache/tracks.json` at build time (`pnpm build` runs `cache:tracks`); at runtime a cache miss falls back to live parsing, so local dev picks up a new track without rebuilding.
 - Region is computed automatically from each track's start coordinates, matched against named bounding boxes in `data/regions.json`.
 - Craft and area are hand-maintained per track in `data/tracks.json` and `data/craft.json`, since Paddle Logger doesn't export that information.
 - Map tiles are free OpenStreetMap tiles rendered with Leaflet; a CSS filter darkens them to match dark mode.
