@@ -29,7 +29,7 @@ importers:
     devDependencies:
       '@iconify-json/lucide':
         specifier: ^1.2.118
-        version: 1.2.118
+        version: 1.2.119
       '@nuxt/eslint':
         specifier: 1.16.0
         version: 1.16.0(@typescript-eslint/utils@8.63.0(eslint@10.7.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@vue/compiler-sfc@3.5.40)(crossws@0.4.9(srvx@0.11.22))(esbuild@0.28.1)(eslint@10.7.0(jiti@2.7.0)(supports-color@10.2.2))(magicast@0.5.3)(oxc-parser@0.140.0)(rolldown@1.2.0)(rollup@4.62.2)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.1.5(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))
@@ -709,8 +709,8 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
-  '@iconify-json/lucide@1.2.118':
-    resolution: {integrity: sha512-JBnK4YOq6K/lA0JP//27QxFxJ4120TjvfXAzGZZIGjCcXcRRRFxl1rcV7+IWdcVCe90KXdqVaAwLaLf6G3HELw==}
+  '@iconify-json/lucide@1.2.119':
+    resolution: {integrity: sha512-KbrC7fT5wPshV1KLRM0k91poP0OH4eKEVywEOH0FCczKb+qth8Pcq1Hy9kS2tXeF52s23qzLnG8AJsExPSupeA==}
 
   '@iconify/collections@1.0.708':
     resolution: {integrity: sha512-9C1wW0tb8VVdsbAdfZfEYklxE2p+jz9Qrm6Lfx/+lWS8i0QiOJ5QtOoZScvs2MwVpJsViw4VeMcpQU0+eQJrHg==}
@@ -6119,7 +6119,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@iconify-json/lucide@1.2.118':
+  '@iconify-json/lucide@1.2.119':
     dependencies:
       '@iconify/types': 2.0.0
 
