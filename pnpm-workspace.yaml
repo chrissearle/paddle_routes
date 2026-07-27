@@ -3,3 +3,16 @@ allowBuilds:
   esbuild: true
   unrs-resolver: true
   vue-demi: true
+
+# Nitro, @nuxt/ui and unstorage all run h3 1.x, but devframe (pulled in by the
+# devtools / eslint config-inspector chain) drags in a 2.x release candidate.
+# Both then sit in the store, and Nuxt's server auto-imports resolve response
+# helpers such as setResponseHeader to the 2.x implementation, which throws
+# against a 1.x event object at runtime ("Cannot read properties of undefined
+# (reading 'set')") — a 500 on every handler that sets a header.
+#
+# Pinning to the version everything else already declares removes 2.x from the
+# tree entirely, so there is nothing to resolve to by mistake. Revisit when
+# Nitro itself moves to h3 2.x.
+overrides:
+  h3: 1.15.11

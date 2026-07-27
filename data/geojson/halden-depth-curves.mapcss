@@ -1,0 +1,15 @@
+/* Halden Depth Curves.mapcss */
+line[dybde_m] {
+    width: 1px;
+    text: eval(tag('depth_label'));
+    text-color: #FFFFFF;
+    font-size: 10;
+    font-stroke-width: 1px;
+    font-stroke-color: #000000;
+}
+line[dybde_m>=0][dybde_m<2]   { color: #D6EAF8; width: 1px; }
+line[dybde_m>=2][dybde_m<5]   { color: #AED6F1; width: 1px; }
+line[dybde_m>=5][dybde_m<10]  { color: #5DADE2; width: 1.5px; }
+line[dybde_m>=10][dybde_m<20] { color: #2E86C1; width: 1.5px; }
+line[dybde_m>=20][dybde_m<30] { color: #1B4F72; width: 2px; }
+line[dybde_m>=30]             { color: #0B2942; width: 2.5px; }

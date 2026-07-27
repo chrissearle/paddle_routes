@@ -3,8 +3,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "pnpm cache:tracks && nuxt build",
+    "build": "pnpm cache:tracks && pnpm cache:geojson && nuxt build",
     "cache:tracks": "tsx scripts/build-track-cache.ts",
+    "cache:geojson": "tsx scripts/build-geojson-cache.ts",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",

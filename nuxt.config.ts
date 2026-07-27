@@ -29,6 +29,13 @@ export default defineNuxtConfig({
         'cache-control': 'public, max-age=300, stale-while-revalidate=86400',
       },
     },
+    // Overlay detail levels are equally fixed per deploy, and far more
+    // bandwidth-sensitive — zooming in and back out must not refetch.
+    '/api/geojson/**': {
+      headers: {
+        'cache-control': 'public, max-age=300, stale-while-revalidate=86400',
+      },
+    },
   },
   vite: {
     optimizeDeps: {

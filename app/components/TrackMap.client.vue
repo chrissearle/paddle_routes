@@ -1,17 +1,21 @@
 <script setup lang="ts">
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import type { EncodedPoint, TrackSummary } from '#shared/types/track'
+import type { EncodedPoint, OverlayLine, OverlayMeta, OverlayStyleRule, TrackSummary } from '#shared/types/track'
 
 const props = defineProps<{
   tracks: TrackSummary[]
   visibleIds: string[]
   geometry: Record<string, EncodedPoint[]>
   pending: boolean
+  overlays: OverlayMeta[]
+  overlayLevels: Map<string, OverlayLine[]>
+  hiddenOverlayIds: Set<string>
 }>()
 
 const emit = defineEmits<{
   'viewport-change': [ids: string[]]
+  'zoom-change': [zoom: number]
 }>()
 
 const wrapperEl = ref<HTMLDivElement>()
@@ -22,6 +26,33 @@ const layers = new Map<string, L.Polyline>()
 // Each layer's bounding box, cached at build time so `updateViewportIds` can
 // reject non-intersecting tracks without walking their points.
 const layerBounds = new Map<string, L.LatLngBounds>()
+
+// Leaflet pane holding GeoJSON overlays. zIndex 350 puts it above the tile
+// pane (200) but below the default overlayPane (400) where track polylines
+// live — so depth curves render *under* the tracks, as required, without
+// depending on the order layers happen to be added in.
+//
+// Leaflet strips a trailing "Pane" from the name when building the element's
+// class, so this yields `.leaflet-geojsonOverlay-pane` — keep the name free of
+// that suffix so the constant and the CSS selector stay obviously related.
+const OVERLAY_PANE = 'geojsonOverlay'
+
+// Per-overlay render state. `lines` is rebuilt only when the chosen detail
+// level changes; `onMap` churns on every pan/zoom as lines enter and leave the
+// viewport, so polylines are constructed lazily and then reused.
+interface OverlayItem {
+  bounds: L.LatLngBounds
+  latLngs: [number, number][]
+  style: L.PolylineOptions
+  layer?: L.Polyline
+}
+
+interface OverlayRender {
+  key: string
+  items: OverlayItem[]
+}
+
+const overlayRenders = new Map<string, OverlayRender>()
 
 // True until the first polyline is on the map, which is what the skeleton
 // covers — `pending` alone would uncover a still-empty map for a frame.
@@ -48,10 +79,20 @@ onMounted(async () => {
     className: 'map-tiles',
   }).addTo(map)
 
-  map.on('moveend', updateViewportIds)
+  map.createPane(OVERLAY_PANE).style.zIndex = '350'
+
+  map.on('moveend', () => {
+    updateViewportIds()
+    // Panning can bring unrendered lines of the *current* level on-screen, and
+    // zooming can change which level applies — both are handled by a resync.
+    emit('zoom-change', map!.getZoom())
+    syncOverlays()
+  })
 
   syncLayers()
   updateViewportIds()
+  emit('zoom-change', map.getZoom())
+  syncOverlays()
 })
 
 onBeforeUnmount(() => {
@@ -144,6 +185,111 @@ function updateViewportIds() {
   emit('viewport-change', ids)
 }
 
+// --- GeoJSON overlays -------------------------------------------------------
+
+function styleFor(meta: OverlayMeta, value: number): L.PolylineOptions {
+  // First matching rule wins, mirroring MapCSS ordering. `min` is inclusive
+  // and `max` exclusive, so adjacent bands never both match.
+  const rule: OverlayStyleRule | undefined = meta.style.find(
+    (r) => (r.min === undefined || value >= r.min) && (r.max === undefined || value < r.max),
+  )
+  return {
+    pane: OVERLAY_PANE,
+    color: rule?.color ?? '#5dade2',
+    weight: rule?.weight ?? 1,
+    // Contours are context, not the subject — keeping them faint stops them
+    // competing with the track lines drawn above. Per-overlay so it can be
+    // tuned from data/geojson.json without touching this component.
+    opacity: meta.opacity ?? 0.75,
+    // As with tracks, decimate in screen space at render time rather than
+    // discarding stored points. Higher than the tracks' factor: these lines
+    // are decoration, so a coarser screen-space threshold is free visually.
+    smoothFactor: 3,
+    interactive: false,
+  }
+}
+
+// Which loaded level to draw. Prefers the level matching the current zoom, but
+// falls back to any other loaded level for the same overlay rather than
+// blanking while the right one downloads — a coarse contour is a much better
+// intermediate state than an empty map.
+function chooseLevelKey(meta: OverlayMeta): string | undefined {
+  if (!map) return undefined
+  const wanted = levelForZoom(meta, map.getZoom())
+  const wantedKey = `${meta.id}:${wanted}`
+  if (props.overlayLevels.has(wantedKey)) return wantedKey
+
+  // Nearest loaded level by distance from the one we actually want.
+  let best: string | undefined
+  let bestDistance = Infinity
+  for (let i = 0; i < meta.levels.length; i++) {
+    const key = `${meta.id}:${i}`
+    const distance = Math.abs(i - wanted)
+    if (props.overlayLevels.has(key) && distance < bestDistance) {
+      best = key
+      bestDistance = distance
+    }
+  }
+  return best
+}
+
+function buildOverlayItems(meta: OverlayMeta, lines: OverlayLine[]): OverlayItem[] {
+  return lines.map(([value, coords]) => ({
+    bounds: L.latLngBounds(coords.map(([lat, lon]) => L.latLng(lat, lon))),
+    latLngs: coords,
+    style: styleFor(meta, value),
+  }))
+}
+
+// Adds/removes overlay polylines to match the current level, visibility and
+// viewport. Viewport culling is by bounding box only — unlike tracks, where a
+// bbox test alone wrongly matched sprawling routes, contour segments are short
+// and local, so their bbox is a tight proxy for the line itself.
+//
+// Note this never touches the map view: overlays must never cause a re-fit,
+// so there is no fitBounds anywhere in this path.
+function syncOverlays() {
+  if (!map) return
+  const viewport = map.getBounds()
+
+  for (const meta of props.overlays) {
+    const render = overlayRenders.get(meta.id)
+    const visible = !props.hiddenOverlayIds.has(meta.id)
+
+    if (!visible) {
+      if (render) for (const item of render.items) item.layer?.remove()
+      continue
+    }
+
+    const key = chooseLevelKey(meta)
+    if (!key) continue
+
+    let current = render
+    if (!current || current.key !== key) {
+      // Level changed — drop the old geometry entirely before building the new.
+      if (current) for (const item of current.items) item.layer?.remove()
+      current = { key, items: buildOverlayItems(meta, props.overlayLevels.get(key) ?? []) }
+      overlayRenders.set(meta.id, current)
+    }
+
+    for (const item of current.items) {
+      const shouldShow = viewport.intersects(item.bounds)
+      if (shouldShow) {
+        item.layer ??= L.polyline(item.latLngs, item.style)
+        if (!map.hasLayer(item.layer)) item.layer.addTo(map)
+      } else {
+        item.layer?.remove()
+      }
+    }
+  }
+}
+
+watch(() => props.overlays, syncOverlays, { deep: false })
+watch(() => props.hiddenOverlayIds, syncOverlays, { deep: true })
+// `overlayLevels` is a reactive Map — a deep watch is what fires when a newly
+// downloaded level is inserted.
+watch(() => props.overlayLevels, syncOverlays, { deep: true })
+
 watch(() => props.tracks, syncLayers, { deep: false })
 watch(() => props.geometry, syncLayers, { deep: false })
 watch(() => props.visibleIds, applyVisibility, { deep: false })
@@ -222,5 +368,12 @@ watch(trackColor, (color) => {
 
 .track-map-wrapper--dark :deep(.map-tiles) {
   filter: brightness(0.65) invert(1) contrast(0.9) hue-rotate(180deg) saturate(0.6);
+}
+
+/* The source palette is a light-basemap ramp running to near-black at depth,
+   which disappears against the darkened tiles. Lifting the whole pane keeps
+   the ramp's ordering intact rather than hand-picking a second palette. */
+.track-map-wrapper--dark :deep(.leaflet-geojsonOverlay-pane) {
+  filter: brightness(1.75) saturate(1.15);
 }
 </style>

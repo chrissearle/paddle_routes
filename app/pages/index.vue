@@ -23,6 +23,28 @@ const {
   copyTrackLink,
 } = useTracks()
 
+const { overlays, overlayLevels, isOverlayVisible, toggleOverlay, hiddenOverlayIds, requestLevel } =
+  useOverlays()
+
+// Detail levels are requested reactively from the map's zoom rather than
+// fetched up front: at the default world view only the coarsest level (~30KB
+// gzipped) is pulled, and the full-detail level (~600KB) is never downloaded
+// unless someone actually zooms in to where it would be legible.
+const mapZoom = ref(2)
+
+function onZoomChange(zoom: number) {
+  mapZoom.value = zoom
+  for (const meta of overlays.value) {
+    if (!isOverlayVisible(meta.id)) continue
+    requestLevel(meta.id, levelForZoom(meta, zoom))
+  }
+}
+
+// Toggling an overlay on after the map has settled must also kick off its
+// fetch — `onZoomChange` only fires on actual map movement. Overlay
+// definitions arriving is the other trigger, for the default-on case.
+watch([hiddenOverlayIds, overlays], () => onZoomChange(mapZoom.value), { deep: true })
+
 const totalDistanceKm = computed(() =>
   visibleSidebarTracks.value.reduce((sum, t) => sum + t.distanceKm, 0),
 )
@@ -54,6 +76,17 @@ function toggleSidebar() {
         :date-options="dateOptions"
       />
       <UButton
+        v-for="overlay in overlays"
+        :key="overlay.id"
+        :icon="isOverlayVisible(overlay.id) ? 'i-lucide-layers' : 'i-lucide-layers-2'"
+        :color="isOverlayVisible(overlay.id) ? 'primary' : 'neutral'"
+        variant="ghost"
+        size="sm"
+        :aria-pressed="isOverlayVisible(overlay.id)"
+        :label="overlay.name"
+        @click="toggleOverlay(overlay.id)"
+      />
+      <UButton
         v-if="!isWide"
         icon="i-lucide-list"
         color="neutral"
@@ -75,8 +108,12 @@ function toggleSidebar() {
         :visible-ids="visibleIds"
         :geometry="geometry"
         :pending="geometryPending"
+        :overlays="overlays"
+        :overlay-levels="overlayLevels"
+        :hidden-overlay-ids="hiddenOverlayIds"
         class="map"
         @viewport-change="setViewportIds"
+        @zoom-change="onZoomChange"
       />
 
       <TrackSidebar
