@@ -8,6 +8,9 @@ export interface Craft {
   model: string
   colour: string
   registration?: string
+  callSign?: string
+  mmsi?: string
+  mobileMmsi?: string
 }
 
 export interface RegionBounds {

@@ -50,6 +50,18 @@ const craftById = computed(() => new Map(props.craft.map((c) => [c.id, c])))
                     <dt>Reg.</dt>
                     <dd>{{ craftById.get(track.craftId)!.registration }}</dd>
                   </template>
+                  <template v-if="craftById.get(track.craftId)!.callSign">
+                    <dt>Call sign</dt>
+                    <dd>{{ craftById.get(track.craftId)!.callSign }}</dd>
+                  </template>
+                  <template v-if="craftById.get(track.craftId)!.mmsi">
+                    <dt>MMSI</dt>
+                    <dd>{{ craftById.get(track.craftId)!.mmsi }}</dd>
+                  </template>
+                  <template v-if="craftById.get(track.craftId)!.mobileMmsi">
+                    <dt>Mobile MMSI</dt>
+                    <dd>{{ craftById.get(track.craftId)!.mobileMmsi }}</dd>
+                  </template>
                 </dl>
               </div>
             </template>

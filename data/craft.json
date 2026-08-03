@@ -1,11 +1,14 @@
 [
   {
     "id": "vega-yellow",
-    "name": "Dark Banana",
+    "name": "Den Kule Gule",
     "type": "kayak",
     "make": "Vega Designs",
     "model": "Explorer 518",
     "colour": "Yellow",
-    "registration": "QRQ03442B525"
+    "registration": "QRQ03442B525",
+    "callSign": "LE4564",
+    "mmsi": "257749100",
+    "mobileMmsi": "825774910"
   }
 ]
