@@ -19,7 +19,7 @@
     "*.{js,ts,vue}": "pnpm lint:fix"
   },
   "dependencies": {
-    "@nuxt/ui": "4.10.0",
+    "@nuxt/ui": "4.11.0",
     "fast-xml-parser": "5.11.0",
     "leaflet": "1.9.4",
     "nuxt": "4.5.2",
