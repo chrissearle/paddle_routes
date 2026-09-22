@@ -93,7 +93,7 @@ jobs:
             IMAGE_TAG=${{ env.SHORT_SHA_TAG }}
 
   build-arm64:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     needs: [check, meta]
     env:
       IMAGE_BASE: ghcr.io/${{ github.repository_owner }}/paddle-routes
