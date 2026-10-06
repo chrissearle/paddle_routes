@@ -15,4 +15,4 @@ allowBuilds:
 # tree entirely, so there is nothing to resolve to by mistake. Revisit when
 # Nitro itself moves to h3 2.x.
 overrides:
-  h3: 1.15.11
+  h3: 2.0.1
