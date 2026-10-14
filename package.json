@@ -29,7 +29,7 @@
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.118",
     "@nuxt/eslint": "1.17.0",
-    "@nuxt/fonts": "0.14.0",
+    "@nuxt/fonts": "1.0.1",
     "@types/leaflet": "1.9.22",
     "@types/node": "26.6.5",
     "eslint": "10.12.0",
