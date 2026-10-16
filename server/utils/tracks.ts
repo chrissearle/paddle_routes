@@ -1,6 +1,13 @@
 import { join } from 'node:path'
 import { useRuntimeConfig } from '#imports'
-import { buildDetail, listGpxFiles, loadCraft, loadRegions, loadTrackConfig, readJson } from './track-parse'
+import {
+  buildDetail,
+  listGpxFiles,
+  loadCraft,
+  loadRegions,
+  loadTrackConfig,
+  readJson,
+} from './track-parse'
 import type {
   Craft,
   EncodedPoint,
@@ -44,7 +51,9 @@ export async function listTrackSummaries(): Promise<TrackSummary[]> {
     loadTrackConfig(dir),
   ])
 
-  const details = await Promise.all(files.map((f) => getOrBuildDetail(dir, f, craftMap, regions, config)))
+  const details = await Promise.all(
+    files.map((f) => getOrBuildDetail(dir, f, craftMap, regions, config)),
+  )
   return details.map(({ pts: _pts, ...summary }) => summary)
 }
 
@@ -59,7 +68,9 @@ export async function listTrackGeometry(): Promise<Record<string, EncodedPoint[]
     loadTrackConfig(dir),
   ])
 
-  const details = await Promise.all(files.map((f) => getOrBuildDetail(dir, f, craftMap, regions, config)))
+  const details = await Promise.all(
+    files.map((f) => getOrBuildDetail(dir, f, craftMap, regions, config)),
+  )
   return Object.fromEntries(details.map((d) => [d.id, d.pts]))
 }
 
@@ -68,6 +79,10 @@ export async function getTrackDetail(id: string): Promise<TrackDetail | undefine
   const files = await listGpxFiles(dir)
   if (!files.includes(id)) return undefined
 
-  const [craftMap, regions, config] = await Promise.all([loadCraft(dir), loadRegions(dir), loadTrackConfig(dir)])
+  const [craftMap, regions, config] = await Promise.all([
+    loadCraft(dir),
+    loadRegions(dir),
+    loadTrackConfig(dir),
+  ])
   return getOrBuildDetail(dir, id, craftMap, regions, config)
 }

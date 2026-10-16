@@ -12,8 +12,7 @@ export function haversineDistanceKm(a: TrackPoint, b: TrackPoint): number {
   const lat1 = toRadians(a.lat)
   const lat2 = toRadians(b.lat)
 
-  const h =
-    Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2
 
   return EARTH_RADIUS_KM * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h))
 }

@@ -11,9 +11,7 @@ const props = defineProps<{
   copyTrackLink: (id: string) => void
 }>()
 
-const sortedTracks = computed(() =>
-  [...props.tracks].sort((a, b) => b.date.localeCompare(a.date)),
-)
+const sortedTracks = computed(() => [...props.tracks].sort((a, b) => b.date.localeCompare(a.date)))
 
 const craftById = computed(() => new Map(props.craft.map((c) => [c.id, c])))
 </script>

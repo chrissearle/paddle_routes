@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags-ignore:
-      - "**"
+      - '**'
     paths-ignore:
       - .run/**
   workflow_dispatch:

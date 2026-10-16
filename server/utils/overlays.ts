@@ -31,13 +31,19 @@ export async function findOverlay(id: string): Promise<OverlayDef | undefined> {
 // tolerance the track cache has. That fallback parses the full source file,
 // which can be tens of MB, so it is genuinely a dev convenience rather than a
 // production path.
-export async function getOverlayLevel(def: OverlayDef, index: number): Promise<OverlayLine[] | undefined> {
+export async function getOverlayLevel(
+  def: OverlayDef,
+  index: number,
+): Promise<OverlayLine[] | undefined> {
   const level = def.levels[index]
   if (!level) return undefined
 
   const dir = dataDir()
   try {
-    const cached = await readFile(join(dir, '.cache', 'geojson', `${def.id}-${index}.json`), 'utf-8')
+    const cached = await readFile(
+      join(dir, '.cache', 'geojson', `${def.id}-${index}.json`),
+      'utf-8',
+    )
     return JSON.parse(cached) as OverlayLine[]
   } catch {
     // Cache miss. Fall back to building from source, which is a dev

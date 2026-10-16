@@ -23,6 +23,8 @@ RUN pnpm run build
 
 FROM node:26-trixie-slim AS deploy
 
+ARG IMAGE_TAG
+ENV NUXT_PUBLIC_IMAGE_TAG=$IMAGE_TAG
 ENV NODE_ENV=production
 
 WORKDIR /app

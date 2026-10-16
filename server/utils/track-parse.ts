@@ -2,7 +2,14 @@ import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { parseGpx } from './gpx'
 import { trackDistanceKm, findRegion } from './geo'
-import type { Craft, EncodedPoint, RegionDef, TrackConfigEntry, TrackDetail, TrackPoint } from '#shared/types/track'
+import type {
+  Craft,
+  EncodedPoint,
+  RegionDef,
+  TrackConfigEntry,
+  TrackDetail,
+  TrackPoint,
+} from '#shared/types/track'
 
 // Pure, Nuxt-context-free GPX parsing shared by the Nitro server
 // (server/utils/tracks.ts) and the build-time cache generator
@@ -82,7 +89,8 @@ export async function buildDetail(
 
   const entry = config.get(filename)
   const craft = entry ? craftMap.get(entry.craftId) : undefined
-  const region = points.length > 0 ? (findRegion(points[0]!, regions) ?? UNKNOWN_REGION) : UNKNOWN_REGION
+  const region =
+    points.length > 0 ? (findRegion(points[0]!, regions) ?? UNKNOWN_REGION) : UNKNOWN_REGION
 
   const startTime = points[0]?.time ?? ''
   const endTime = points.at(-1)?.time ?? ''

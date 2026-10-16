@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import type { EncodedPoint, OverlayLine, OverlayMeta, OverlayStyleRule, TrackSummary } from '#shared/types/track'
+import type {
+  EncodedPoint,
+  OverlayLine,
+  OverlayMeta,
+  OverlayStyleRule,
+  TrackSummary,
+} from '#shared/types/track'
 
 const props = defineProps<{
   tracks: TrackSummary[]
@@ -74,7 +80,8 @@ onMounted(async () => {
   // than pinned to any one region.
   map = L.map(mapEl.value).setView([20, 0], 2)
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19,
     className: 'map-tiles',
   }).addTo(map)
@@ -299,7 +306,11 @@ watch(trackColor, (color) => {
 </script>
 
 <template>
-  <div ref="wrapperEl" class="track-map-wrapper" :class="{ 'track-map-wrapper--dark': colorMode.value === 'dark' }">
+  <div
+    ref="wrapperEl"
+    class="track-map-wrapper"
+    :class="{ 'track-map-wrapper--dark': colorMode.value === 'dark' }"
+  >
     <div ref="mapEl" class="track-map" />
     <Transition name="skeleton">
       <div v-if="showSkeleton" class="track-map-skeleton">

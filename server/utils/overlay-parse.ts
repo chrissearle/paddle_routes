@@ -97,7 +97,11 @@ function matchesInterval(value: number, interval: number): boolean {
   return Math.round(value * 1000) % Math.round(interval * 1000) === 0
 }
 
-export function buildLevel(collection: SourceCollection, def: OverlayDef, level: OverlayLevel): OverlayLine[] {
+export function buildLevel(
+  collection: SourceCollection,
+  def: OverlayDef,
+  level: OverlayLevel,
+): OverlayLine[] {
   const lines: OverlayLine[] = []
   const factor = 10 ** level.precision
 

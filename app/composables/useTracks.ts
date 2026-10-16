@@ -62,7 +62,9 @@ export function useTracks() {
   // synchronously (rather than waiting on the fetch) keeps SSR and client
   // renders identical, avoiding a hydration mismatch.
   const rawTrackParam = route.query.track
-  const soloId = ref<string>(Array.isArray(rawTrackParam) ? (rawTrackParam[0] ?? '') : (rawTrackParam ?? ''))
+  const soloId = ref<string>(
+    Array.isArray(rawTrackParam) ? (rawTrackParam[0] ?? '') : (rawTrackParam ?? ''),
+  )
 
   watch(
     filteredTracks,

@@ -1,6 +1,12 @@
 import { writeFile, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
-import { buildDetail, listGpxFiles, loadCraft, loadRegions, loadTrackConfig } from '../server/utils/track-parse'
+import {
+  buildDetail,
+  listGpxFiles,
+  loadCraft,
+  loadRegions,
+  loadTrackConfig,
+} from '../server/utils/track-parse'
 import type { TrackDetail } from '../shared/types/track'
 
 const dataDir = process.env.DATA_DIR || './data'

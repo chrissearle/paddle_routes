@@ -24,6 +24,10 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      # ESLint covers js/ts/vue formatting; this catches the rest (md, json, css, yaml)
+      - name: Format check
+        run: pnpm format:check
+
       - name: Typecheck
         run: pnpm typecheck
 
