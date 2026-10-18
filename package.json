@@ -22,7 +22,7 @@
     "*.{md,json,css,yml,yaml}": "prettier --write --ignore-unknown"
   },
   "dependencies": {
-    "@nuxt/ui": "4.11.3",
+    "@nuxt/ui": "4.12.0",
     "fast-xml-parser": "5.11.2",
     "leaflet": "1.9.4",
     "nuxt": "4.6.1",
