@@ -37,7 +37,7 @@
     "@prometheus-io/client": "0.16.1",
     "@types/leaflet": "1.9.22",
     "@types/node": "26.6.5",
-    "eslint": "10.12.0",
+    "eslint": "10.13.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.7",
     "husky": "9.1.7",
