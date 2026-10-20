@@ -14,6 +14,10 @@ permissions:
   contents: read
   packages: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Pushes to main don't go through the PR check, so run lint + typecheck here
   # too — otherwise a broken typecheck (which `nuxt build` does not catch) can
