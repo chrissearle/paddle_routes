@@ -1,8 +1,9 @@
 <script setup lang="ts">
 const colorMode = useColorMode()
+const isDark = computed(() => colorMode.value === 'dark')
 
 function toggleColorMode() {
-  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+  colorMode.preference = isDark.value ? 'light' : 'dark'
 }
 </script>
 
@@ -25,7 +26,7 @@ function toggleColorMode() {
             aria-label="View source on GitHub"
           />
           <UButton
-            :icon="colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'"
+            :icon="isDark ? 'i-lucide-sun' : 'i-lucide-moon'"
             color="neutral"
             variant="ghost"
             aria-label="Toggle dark mode"
