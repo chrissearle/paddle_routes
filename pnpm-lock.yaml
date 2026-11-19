@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@nuxt/ui':
-        specifier: 4.12.1
-        version: 4.12.1(bc6101479d184a16c5db1c974d87ad11)
+        specifier: 4.12.2
+        version: 4.12.2(bc6101479d184a16c5db1c974d87ad11)
       fast-xml-parser:
         specifier: 5.12.1
         version: 5.12.1
@@ -1213,8 +1213,8 @@ packages:
     peerDependencies:
       '@nuxt/kit': '>=3.0.0'
 
-  '@nuxt/ui@4.12.1':
-    resolution: {integrity: sha512-1kIyff5whq7gXo17Yp0vsPcjycnBCeekiJtMExC9TaaJftEhxjF1PQZRG0AbwVh0oPKUQUhfz0MhKHn/scW1ZA==}
+  '@nuxt/ui@4.12.2':
+    resolution: {integrity: sha512-C2ne57yUMM4+TmKOnXIZthcMgUkhPLm8Olt1T/HgBNSz5UlKhgyftGqZ8UJXKN6oEN1kfj7X7Y+w1jcySWmJ7A==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       '@inertiajs/vue3': ^2.0.7 || ^3
@@ -7126,7 +7126,7 @@ snapshots:
       rc9: 3.1.0
       std-env: 4.3.0
 
-  '@nuxt/ui@4.12.1(bc6101479d184a16c5db1c974d87ad11)':
+  '@nuxt/ui@4.12.2(bc6101479d184a16c5db1c974d87ad11)':
     dependencies:
       '@floating-ui/dom': 1.8.0
       '@iconify/vue': 5.0.3(vue@3.5.45(typescript@6.0.3))
